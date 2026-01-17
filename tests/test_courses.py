@@ -3,50 +3,24 @@ from playwright.sync_api import sync_playwright, expect
 
 @pytest.mark.regression
 @pytest.mark.courses
-def test_empty_courses_list():
+def test_empty_courses_list(chromium_page_with_state):
 
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=False)
-        context = browser.new_context()
-        page = context.new_page()
+    chromium_page_with_state.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses")
 
-        page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration")
+    courses_text = chromium_page_with_state.get_by_test_id('courses-list-toolbar-title-text')
+    expect(courses_text).to_be_visible()
+    expect(courses_text).to_have_text("Courses")
 
-        email_input = page.get_by_test_id('registration-form-email-input').locator('input')
-        email_input.fill('user.name@gmail.com')
+    no_result_text = chromium_page_with_state.get_by_test_id('courses-list-empty-view-title-text')
+    expect(no_result_text).to_be_visible()
+    expect(no_result_text).to_have_text("There is no results")
 
-        username_input = page.get_by_test_id('registration-form-username-input').locator('input')
-        username_input.fill('username')
+    no_result_icon = chromium_page_with_state.get_by_test_id('courses-list-empty-view-icon')
+    expect(no_result_icon).to_be_visible()
 
-        password_input = page.get_by_test_id('registration-form-password-input').locator('input')
-        password_input.fill('password')
-
-        registration_button = page.get_by_test_id('registration-page-registration-button')
-        registration_button.click()
-
-        context.storage_state(path="browser-state.json")
-
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=False)
-        context = browser.new_context(storage_state="browser-state.json")
-        page = context.new_page()
-
-        page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses")
-
-        courses_text = page.get_by_test_id('courses-list-toolbar-title-text')
-        expect(courses_text).to_be_visible()
-        expect(courses_text).to_have_text("Courses")
-
-        no_result_text = page.get_by_test_id('courses-list-empty-view-title-text')
-        expect(no_result_text).to_be_visible()
-        expect(no_result_text).to_have_text("There is no results")
-
-        no_result_icon = page.get_by_test_id('courses-list-empty-view-icon')
-        expect(no_result_icon).to_be_visible()
-
-        no_result_desc = page.get_by_test_id('courses-list-empty-view-description-text')
-        expect(no_result_desc).to_be_visible()
-        expect(no_result_desc).to_have_text("Results from the load test pipeline will be displayed here")
+    no_result_desc = chromium_page_with_state.get_by_test_id('courses-list-empty-view-description-text')
+    expect(no_result_desc).to_be_visible()
+    expect(no_result_desc).to_have_text("Results from the load test pipeline will be displayed here")
 
 
 
